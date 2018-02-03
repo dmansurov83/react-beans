@@ -5,40 +5,45 @@ Usage:
 
 1. Wrap your app with BeanProvider component:
 ```jsx harmony
-        <BeanProvider><App/><BeanProvider>
+        <BeanProvider>
+            <App/>
+        <BeanProvider>
 ```    
-2. Resister your bean services:
+2. Register your bean services:
 * with decorators:
 ```jsx harmony
-@bean("super")
-export default class SuperService{
+@bean("example")
+export default class ExampleService{
     doAction = () => "ActionResult"
 }
 ```
 or 
 ```jsx harmony
-bean("super")(SuperService)
+bean("example")(ExampleService)
 ```
 3. Inject:
 * to component
 ```jsx harmony
-@connectBeans("super")
+@connectBeans("example", "otherService")
 class About extends Component {
-
+    ...
     componentDidMount(){
-        const result = this.props.super().doAction();
+        const result = this.props.example().doAction();
+        this.props.otherService().someAction(result)
     }
     ...
 }
 ```
 * to other service
 ```jsx harmony
-@connectBeans("Super")
-class NotSuperService {
+@connectBeans("example", "otherService")
+class AlertService {
+    ...
     alert = () => {
         const result = this.super().doAction();
-        alert(result)
+        this.props.otherService().someAction(result)
     }
+    ...
 }
 ```      
         
