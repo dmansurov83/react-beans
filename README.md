@@ -38,12 +38,19 @@ class About extends Component {
 ```jsx harmony
 @connectBeans("example", "otherService")
 class AlertService {
+    postInject(){
+        //calls after beans 
+        this.example = this.example();
+    }
+        
     ...
     alert = () => {
-        const result = this.example().doAction();
+        const result = this.example.doAction();
         this.props.otherService().someAction(result)
     }
     ...
 }
 ```      
+## See full example in ./example
+just clone repo & npm i & npm start
         
