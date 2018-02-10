@@ -40,7 +40,7 @@ class About extends Component {
 class AlertService {
     ...
     alert = () => {
-        const result = this.super().doAction();
+        const result = this.example().doAction();
         this.props.otherService().someAction(result)
     }
     ...
