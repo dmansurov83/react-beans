@@ -71,6 +71,7 @@ const getBeanInstance = (context, key) => {
     }
     const bean = new beanInfo.class();
     bean.beansContext = context;
+    if (bean.postInject) bean.postInject()
     if (beanInfo.scope == BeanScope.SINGLETON){
         context.beansInst[key] = bean
     }
