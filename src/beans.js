@@ -3,19 +3,27 @@ import PropTypes from 'prop-types';
 
 const beansClasses = {};
 
-const bean = (name) => (target) => {
+const BeanScope = {
+    SINGLETON: 'SINGLETON',
+    INSTANCE: 'INSTANCE'
+}
+
+const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
     const regName = name || target;
     if (beansClasses[regName]) {
         throw new Error(`trying to register already defined bean "${regName}"`);
     } else {
-        beansClasses[regName] = target;
+        beansClasses[regName] = {
+            scope,
+            class: target
+        }
     }
 };
 
 function componentWrapper(WrappedComponent, keys = []) {
     class ClassWithBeans extends React.Component {
         static contextTypes = {
-            beans: PropTypes.object,
+            getBeanInstance: PropTypes.func,
             beansInst: PropTypes.object,
         };
 
@@ -24,12 +32,12 @@ function componentWrapper(WrappedComponent, keys = []) {
             this.beans = {};
             const self = this;
             keys.forEach((key) => {
-                self.beans[key] = self.context.beans[key];
+                self.beans[key] = () => self.context.getBeanInstance(key);
             });
         }
 
         render() {
-            return <WrappedComponent {...this.props} {...this.beans}/>;
+            return <WrappedComponent {...this.props} {...this.beans} />;
         }
     }
 
@@ -40,7 +48,7 @@ function classWrapper(WrappedClass, keys = []) {
     const p = WrappedClass.prototype;
     keys.forEach((key) => {
         p[key] = function () {
-            return this.beansContext.beans[key]();
+            return this.beansContext.getBeanInstance(key);
         };
     });
 }
@@ -52,22 +60,21 @@ const connectBeans = function (...beans) {
     };
 };
 
-const createBeans = (context) => {
-    const beans = {};
-    for (const key in beansClasses) {
-        beans[key] = () => {
-            if (!context.beansInst) {
-                context.beansInst = {};
-            }
-            let inst = context.beansInst[key];
-            if (!inst) {
-                inst = context.beansInst[key] = new beansClasses[key]();
-                inst.beansContext = context;
-            }
-            return inst;
-        };
+const getBeanInstance = (context, key) => {
+    if (!beansClasses[key]) throw new Error(`Bean with name ${key} not registered`)
+    if (!context.beansInst) {
+        context.beansInst = {};
     }
-    return beans;
-};
+    const beanInfo = beansClasses[key];
+    if (beanInfo.scope == BeanScope.SINGLETON && context.beansInst[key]){
+        return context.beansInst[key]
+    }
+    const bean = new beanInfo.class();
+    bean.beansContext = context;
+    if (beanInfo.scope == BeanScope.SINGLETON){
+        context.beansInst[key] = bean
+    }
+    return bean;
+}
 
-export {bean, createBeans, connectBeans};
+export { bean, connectBeans, getBeanInstance };

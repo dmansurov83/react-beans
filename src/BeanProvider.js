@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {createBeans} from "./beans";
+import {getBeanInstance} from "./beans";
 
 export default class BeanProvider extends React.Component{
     static propTypes = {
@@ -8,14 +8,14 @@ export default class BeanProvider extends React.Component{
     };
 
     static childContextTypes = {
-        beans: PropTypes.object.isRequired,
+        getBeanInstance: PropTypes.func.isRequired,
         beansInst: PropTypes.object,
     };
 
     constructor(props){
         super(props);
         this.beansContext = {};
-        this.beansContext.beans = createBeans(this.beansContext)
+        this.beansContext.getBeanInstance = (key) => getBeanInstance(this.beansContext, key)
     }
 
     getChildContext() {
