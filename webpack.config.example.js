@@ -8,6 +8,7 @@ module.exports = {
         path: path.resolve(__dirname, 'build-example'),
         filename: 'index.js',
     },
+    devtool: 'source-map',
     module: {
         rules: [
             {
