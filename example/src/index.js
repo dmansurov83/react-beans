@@ -4,4 +4,8 @@ import BeanProvider from '../../src/BeanProvider';
 
 import App from './app/App';
 
-ReactDOM.render( <BeanProvider><App/></BeanProvider>, document.getElementById( 'root' ) );
+const config = {
+    exampleConfigValue: 'exampleConfigValue',
+}
+
+ReactDOM.render(<BeanProvider config={config}><App /></BeanProvider>, document.getElementById('root'));

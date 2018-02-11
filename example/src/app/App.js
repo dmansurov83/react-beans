@@ -4,7 +4,7 @@ import './services/ExampleService';
 import './services/ExampleService2';
 import './services/Logger';
 
-@connectBeans("log", "example2")
+@connectBeans("log", "example2", "config")
 export default class App extends React.Component {
   constructor( props ) {
     super( props );
@@ -17,8 +17,12 @@ export default class App extends React.Component {
   }
 
   render() {
+    const config = this.props.config();
     return (
       <div>
+          <div>
+            Config: {config.exampleConfigValue}
+          </div>
           {this.exampleService2.action(Math.random())}
       </div>
     );

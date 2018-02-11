@@ -14,7 +14,11 @@ export default class BeanProvider extends React.Component{
 
     constructor(props){
         super(props);
-        this.beansContext = {};
+        this.beansContext = {
+            beansInst:{
+                ...props
+            }
+        };
         this.beansContext.getBeanInstance = (key) => getBeanInstance(this.beansContext, key)
     }
 

@@ -61,14 +61,12 @@ const connectBeans = function (...beans) {
 };
 
 const getBeanInstance = (context, key) => {
-    if (!beansClasses[key]) throw new Error(`Bean with name ${key} not registered`)
     if (!context.beansInst) {
         context.beansInst = {};
     }
+    if (!!context.beansInst[key]) return context.beansInst[key];
+    if (!beansClasses[key]) throw new Error(`Bean with name ${key} not registered`)
     const beanInfo = beansClasses[key];
-    if (beanInfo.scope == BeanScope.SINGLETON && context.beansInst[key]){
-        return context.beansInst[key]
-    }
     const bean = new beanInfo.class();
     bean.beansContext = context;
     if (bean.postInject) bean.postInject()
