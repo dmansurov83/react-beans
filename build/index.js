@@ -385,7 +385,7 @@ module.exports = ReactPropTypesSecret;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.connectBeans = exports.createBeans = exports.bean = undefined;
+exports.getBeanInstance = exports.connectBeans = exports.bean = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -409,13 +409,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var beansClasses = {};
 
+var BeanScope = {
+    SINGLETON: 'SINGLETON',
+    INSTANCE: 'INSTANCE'
+};
+
 var bean = function bean(name) {
+    var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : BeanScope.SINGLETON;
     return function (target) {
         var regName = name || target;
         if (beansClasses[regName]) {
             throw new Error('trying to register already defined bean "' + regName + '"');
         } else {
-            beansClasses[regName] = target;
+            beansClasses[regName] = {
+                scope: scope,
+                class: target
+            };
         }
     };
 };
@@ -434,7 +443,9 @@ function componentWrapper(WrappedComponent) {
             _this.beans = {};
             var self = _this;
             keys.forEach(function (key) {
-                self.beans[key] = self.context.beans[key];
+                self.beans[key] = function () {
+                    return self.context.getBeanInstance(key);
+                };
             });
             return _this;
         }
@@ -450,7 +461,7 @@ function componentWrapper(WrappedComponent) {
     }(_react2.default.Component);
 
     ClassWithBeans.contextTypes = {
-        beans: _propTypes2.default.object,
+        getBeanInstance: _propTypes2.default.func,
         beansInst: _propTypes2.default.object
     };
 
@@ -464,7 +475,7 @@ function classWrapper(WrappedClass) {
     var p = WrappedClass.prototype;
     keys.forEach(function (key) {
         p[key] = function () {
-            return this.beansContext.beans[key]();
+            return this.beansContext.getBeanInstance(key);
         };
     });
 }
@@ -480,32 +491,25 @@ var connectBeans = function connectBeans() {
     };
 };
 
-var createBeans = function createBeans(context) {
-    var beans = {};
-
-    var _loop = function _loop(key) {
-        beans[key] = function () {
-            if (!context.beansInst) {
-                context.beansInst = {};
-            }
-            var inst = context.beansInst[key];
-            if (!inst) {
-                inst = context.beansInst[key] = new beansClasses[key]();
-                inst.beansContext = context;
-            }
-            return inst;
-        };
-    };
-
-    for (var key in beansClasses) {
-        _loop(key);
+var getBeanInstance = function getBeanInstance(context, key) {
+    if (!context.beansInst) {
+        context.beansInst = {};
     }
-    return beans;
+    if (!!context.beansInst[key]) return context.beansInst[key];
+    if (!beansClasses[key]) throw new Error('Bean with name ' + key + ' not registered');
+    var beanInfo = beansClasses[key];
+    var bean = new beanInfo.class();
+    bean.beansContext = context;
+    if (bean.postInject) bean.postInject();
+    if (beanInfo.scope == BeanScope.SINGLETON) {
+        context.beansInst[key] = bean;
+    }
+    return bean;
 };
 
 exports.bean = bean;
-exports.createBeans = createBeans;
 exports.connectBeans = connectBeans;
+exports.getBeanInstance = getBeanInstance;
 
 /***/ }),
 /* 5 */
@@ -1431,6 +1435,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(5);
@@ -1459,8 +1465,12 @@ var BeanProvider = function (_React$Component) {
 
         var _this = _possibleConstructorReturn(this, (BeanProvider.__proto__ || Object.getPrototypeOf(BeanProvider)).call(this, props));
 
-        _this.beansContext = {};
-        _this.beansContext.beans = (0, _beans.createBeans)(_this.beansContext);
+        _this.beansContext = {
+            beansInst: _extends({}, props)
+        };
+        _this.beansContext.getBeanInstance = function (key) {
+            return (0, _beans.getBeanInstance)(_this.beansContext, key);
+        };
         return _this;
     }
 
@@ -1483,7 +1493,7 @@ BeanProvider.propTypes = {
     children: _propTypes2.default.element.isRequired
 };
 BeanProvider.childContextTypes = {
-    beans: _propTypes2.default.object.isRequired,
+    getBeanInstance: _propTypes2.default.func.isRequired,
     beansInst: _propTypes2.default.object
 };
 exports.default = BeanProvider;
