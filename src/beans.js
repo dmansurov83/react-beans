@@ -15,7 +15,7 @@ const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
     } else {
         beansClasses[regName] = {
             scope,
-            class: target
+            target,
         }
     }
 };
@@ -67,7 +67,7 @@ const getBeanInstance = (context, key) => {
     if (!!context.beansInst[key]) return context.beansInst[key];
     if (!beansClasses[key]) throw new Error(`Bean with name ${key} not registered`)
     const beanInfo = beansClasses[key];
-    const bean = new beanInfo.class();
+    const bean = typeof beanInfo.target === 'function' ? new beanInfo.target() : beanInfo.target;
     bean.beansContext = context;
     if (bean.postInject) bean.postInject()
     if (beanInfo.scope == BeanScope.SINGLETON){

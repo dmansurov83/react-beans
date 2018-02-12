@@ -3,8 +3,9 @@ import { connectBeans } from '../../../src/beans';
 import './services/ExampleService';
 import './services/ExampleService2';
 import './services/Logger';
+import './config';
 
-@connectBeans("log", "example2", "config")
+@connectBeans("log", "example2", "config", "nonBean")
 export default class App extends React.Component {
   constructor( props ) {
     super( props );
@@ -18,10 +19,14 @@ export default class App extends React.Component {
 
   render() {
     const config = this.props.config();
+    const nonBean = this.props.nonBean();
     return (
       <div>
           <div>
-            Config: {config.exampleConfigValue}
+            Config: {config.api}
+          </div>
+          <div>
+            nonBean: {nonBean.exampleValue}
           </div>
           {this.exampleService2.action(Math.random())}
       </div>

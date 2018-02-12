@@ -4,8 +4,8 @@ import BeanProvider from '../../src/BeanProvider';
 
 import App from './app/App';
 
-const config = {
-    exampleConfigValue: 'exampleConfigValue',
+const nonBean = {
+    exampleValue: 'exampleValue',
 }
 
-ReactDOM.render(<BeanProvider config={config}><App /></BeanProvider>, document.getElementById('root'));
+ReactDOM.render(<BeanProvider nonBean={nonBean}><App /></BeanProvider>, document.getElementById('root'));
