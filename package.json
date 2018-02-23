@@ -1,6 +1,6 @@
 {
   "name": "react-beans",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "React DI library",
   "main": "lib/index.js",
   "scripts": {
