@@ -20,7 +20,10 @@ const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
     const profiles = target[PROFILES_PROP] ? target[PROFILES_PROP] : [DEFAULT_PROFILE];
     profiles.forEach(profile => {
         if (!beansClasses[profile]) beansClasses[profile] = {};
-        const regName = name || target;
+        const regName = name || target.name;
+        if (!regName){
+            throw new Error(`Bean qualifier not specified`, target)
+        }
         if (beansClasses[profile][regName]) {
             throw new Error(`trying to register already defined bean "${regName}"`);
         } else {
