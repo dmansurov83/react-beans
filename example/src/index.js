@@ -8,4 +8,9 @@ const nonBean = {
     exampleValue: 'exampleValue',
 }
 
-ReactDOM.render(<BeanProvider nonBean={nonBean}><App /></BeanProvider>, document.getElementById('root'));
+ReactDOM.render(
+    <BeanProvider
+        activeProfile="test"
+        nonBean={nonBean}>
+        <App />
+    </BeanProvider>, document.getElementById('root'));

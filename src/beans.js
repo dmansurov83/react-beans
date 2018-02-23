@@ -7,17 +7,29 @@ const BeanScope = {
     SINGLETON: 'SINGLETON',
     INSTANCE: 'INSTANCE'
 }
+const DEFAULT_PROFILE = 'default';
+const PROFILES_PROP = 'X-Bean-Profiles'
+
+const profile = (...profiles) => (target) => {
+    if (profiles && profiles.length) {
+        target[PROFILES_PROP] = profiles;
+    }
+}
 
 const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
-    const regName = name || target;
-    if (beansClasses[regName]) {
-        throw new Error(`trying to register already defined bean "${regName}"`);
-    } else {
-        beansClasses[regName] = {
-            scope,
-            target,
+    const profiles = target[PROFILES_PROP] ? target[PROFILES_PROP] : [DEFAULT_PROFILE];
+    profiles.forEach(profile => {
+        if (!beansClasses[profile]) beansClasses[profile] = {};
+        const regName = name || target;
+        if (beansClasses[profile][regName]) {
+            throw new Error(`trying to register already defined bean "${regName}"`);
+        } else {
+            beansClasses[profile][regName] = {
+                scope,
+                target,
+            }
         }
-    }
+    })
 };
 
 function componentWrapper(WrappedComponent, keys = []) {
@@ -60,20 +72,20 @@ const connectBeans = function (...beans) {
     };
 };
 
-const getBeanInstance = (context, key) => {
+const getBeanInstance = (context, key, profile = DEFAULT_PROFILE) => {
     if (!context.beansInst) {
         context.beansInst = {};
     }
     if (!!context.beansInst[key]) return context.beansInst[key];
-    if (!beansClasses[key]) throw new Error(`Bean with name ${key} not registered`)
-    const beanInfo = beansClasses[key];
+    const beanInfo = beansClasses[profile][key] || beansClasses[DEFAULT_PROFILE][key];
+    if (!beanInfo) throw new Error(`Bean with qualifier <${key}> not registered for profile <${profile}>`)
     const bean = typeof beanInfo.target === 'function' ? new beanInfo.target() : beanInfo.target;
     bean.beansContext = context;
     if (bean.postInject) bean.postInject()
-    if (beanInfo.scope == BeanScope.SINGLETON){
+    if (beanInfo.scope == BeanScope.SINGLETON) {
         context.beansInst[key] = bean
     }
     return bean;
 }
 
-export { bean, connectBeans, getBeanInstance };
+export { bean, profile, connectBeans, getBeanInstance };

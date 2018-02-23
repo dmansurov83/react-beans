@@ -4,6 +4,7 @@ import {getBeanInstance} from "./beans";
 
 export default class BeanProvider extends React.Component{
     static propTypes = {
+        activeProfile: PropTypes.string,
         children: PropTypes.element.isRequired,
     };
 
@@ -14,12 +15,13 @@ export default class BeanProvider extends React.Component{
 
     constructor(props){
         super(props);
+        const {activeProfile, ...passedBeans} = props;
         this.beansContext = {
             beansInst:{
-                ...props
+                ...passedBeans
             }
         };
-        this.beansContext.getBeanInstance = (key) => getBeanInstance(this.beansContext, key)
+        this.beansContext.getBeanInstance = (key) => getBeanInstance(this.beansContext, key, activeProfile)
     }
 
     getChildContext() {

@@ -1,7 +1,16 @@
-import { bean, connectBeans } from "../../../../src/beans";
+import { profile, bean, connectBeans } from "../../../../src/beans";
+
+
+@bean("example") //first 
+@profile("test") // second, its important
+class ExampleService{
+    action(){
+        return 'TestExampleServiceAction'
+    }
+}
 
 @bean("example")
-class ExampleService{
+class TestExampleService{
     action(){
         return 'ExampleServiceAction'
     }
