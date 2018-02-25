@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import BeanProvider from '../../src/BeanProvider';
 import App from './app/App';
 
-const ACTIVE_PROFILE='debug'; //take from build env
+const ACTIVE_PROFILE='release'; //take from build env
 
 const nonBean = {
     exampleValue: 'exampleValue',

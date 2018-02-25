@@ -23,7 +23,7 @@ export default class App extends React.Component {
     return (
       <div>
           <div>
-            Config: {config.api}
+            Config: {config.api}; {config.configValue}
           </div>
           <div>
             nonBean: {nonBean.exampleValue}
