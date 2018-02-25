@@ -51,6 +51,32 @@ class AlertService {
     ...
 }
 ```      
+## Profiles
+You can define which bean will be created depending on the active profile.
+1. Declare beans for profiles:
+```jsx harmony
+@bean("log")
+@profile("debug", "test")
+class DebugLogger{    
+    info(...args){
+        console.log((new Date()).toISOString(), ...args)
+    }
+}
+
+@bean("log")
+@profile("release")
+class ReleaseLogger{    
+    info(...args){
+        //do nothing or send logs
+    }
+}
+```
+2. Define active profile in BeanProvider
+```jsx harmony
+<BeanProvider activeProfile="debug"><App/></BeanProvider>
+```
+! Keep the decorators in order: @bean @profile class !
+
 ## See full example in ./example
 just clone repo & npm i & npm start
         
