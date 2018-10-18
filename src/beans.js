@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const beansClasses = {};
+let beansClasses = {};
 
 const BeanScope = {
     SINGLETON: 'SINGLETON',
@@ -37,16 +37,16 @@ const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
 };
 
 const inject = beanKey => (target, key) => {
-    let beanInstance;
     return {
         configurable: true,
         get() {
-            if (beanInstance) return beanInstance;
+            const privateKey = `_bean_instance_${key}`;
+            if (this[privateKey]) return this[privateKey];
             const context = this.beansContext || this.props;
             const resolveBean = context && context.getBeanInstance;
             if (!resolveBean) throw new Error(`Cant find bean resolver in ${target}`);
-            beanInstance = resolveBean(beanKey);
-            return beanInstance;
+            this[privateKey] = resolveBean(beanKey);
+            return this[privateKey];
         },
         set() {
             throw new Error(`${key} is readonly`);

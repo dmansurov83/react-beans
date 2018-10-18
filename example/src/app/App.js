@@ -16,7 +16,7 @@ export default class App extends React.Component {
     nonBean;
 
     componentDidMount() {
-        this.logger.info("App mounted")
+        this.logger.info("App mounted");
     }
 
     render() {
