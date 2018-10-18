@@ -1,6 +1,8 @@
 import { bean, profile } from "../../../../src/beans";
 
-@bean("log")
+export const LOGGER = "log";
+
+@bean(LOGGER)
 @profile("debug")
 class DebugLogger{
     
@@ -13,7 +15,7 @@ class DebugLogger{
     }
 }
 
-@bean("log")
+@bean(LOGGER)
 @profile("release")
 class ReleaseLogger{
     

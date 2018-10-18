@@ -1,5 +1,9 @@
 # react-beans
-##React dependency injection library
+# 0.1.0 critical api changes:
+- all injections by property @inject now.
+- @connectBeans now only for react components, otherwise it causes an error;
+- @connectBeans now without args;
+## React dependency injection library
 
 Usage:
 
@@ -12,41 +16,60 @@ Usage:
 2. Register your bean services:
 * with decorators:
 ```jsx harmony
-@bean("example")
+export const EXAMPLE_SERVICE = "example";
+
+@bean(EXAMPLE_SERVICE)
 export default class ExampleService{
     doAction = () => "ActionResult"
 }
 ```
 or 
 ```jsx harmony
-bean("example")(ExampleService)
+bean(EXAMPLE_SERVICE)(ExampleService)
 ```
 3. Inject:
+
+important: js files should be imported to be added to the chunk
+
+All injections are lazy - Instances are created only if you access to the @inject property.
+  
+
 * to component
 ```jsx harmony
-@connectBeans("example", "otherService")
+@connectBeans
 class About extends Component {
+    @inject(EXAMPLE_SERVICE)
+    example;
+    @inject(OTHER_SERVICE)
+    otherService;
     ...
     componentDidMount(){
-        const result = this.props.example().doAction();
-        this.props.otherService().someAction(result)
+        const result = this.example.doAction();
+        this.otherService.someAction(result)
     }
     ...
 }
 ```
 * to other service
 ```jsx harmony
-@connectBeans("example", "otherService")
+const ALERT_SERVICE = "alert";
+
+@bean(ALERT_SERVICE)
+@connectBeans(EXAMPLE_SERVICE, OTHER_SERVICE)
 class AlertService {
+    @inject("example")
+    example;
+    @inject("otherService")
+    otherService;
+    
     postInject(){
-        //calls after beans 
-        this.example = this.example();
+        //do something after bean injected 
     }
         
     ...
     alert = () => {
         const result = this.example.doAction();
-        this.props.otherService().someAction(result)
+        this.otherService.someAction(result)
     }
     ...
 }
@@ -55,7 +78,7 @@ class AlertService {
 You can define which bean will be created depending on the active profile.
 1. Declare beans for profiles:
 ```jsx harmony
-@bean("log")
+@bean(LOGGER)
 @profile("debug", "test")
 class DebugLogger{    
     info(...args){
@@ -63,7 +86,7 @@ class DebugLogger{
     }
 }
 
-@bean("log")
+@bean(LOGGER)
 @profile("release")
 class ReleaseLogger{    
     info(...args){

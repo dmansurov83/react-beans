@@ -7,7 +7,7 @@ const ACTIVE_PROFILE='release'; //take from build env
 
 const nonBean = {
     exampleValue: 'exampleValue',
-}
+};
 
 ReactDOM.render(
     <BeanProvider

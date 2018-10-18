@@ -1,6 +1,8 @@
-import { profile, bean, connectBeans } from "../../../../src/beans";
+import { profile, bean } from "../../../../src/beans";
 
-@bean("example") //first 
+export const EXAMPLE_SERVICE = "example";
+
+@bean(EXAMPLE_SERVICE) //first
 @profile("test") // second, its important
 class TestExampleService{
     action(){
@@ -8,7 +10,7 @@ class TestExampleService{
     }
 }
 
-@bean("example")
+@bean(EXAMPLE_SERVICE)
 class ExampleService{
     action(){
         return 'ExampleServiceAction'

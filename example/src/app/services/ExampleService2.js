@@ -1,17 +1,18 @@
-import { bean, connectBeans } from "../../../../src/beans";
+import {bean, inject} from "../../../../src/beans";
+import {LOGGER} from "./Logger";
+import {EXAMPLE_SERVICE} from "./ExampleService";
 
-@bean("example2")
-@connectBeans("log", "example")
+export const EXAMPLE_SERVICE2 = "example2";
+
+@bean(EXAMPLE_SERVICE2)
 class ExampleService2{
-
-    postInject(){
-        this.log = this.log()
-        this.example = this.example()
-    }
-
+    @inject(LOGGER)
+    log;
+    @inject(EXAMPLE_SERVICE)
+    example;
     action(arg){
-        this.log.info("ExampleService", this.example.action())
-        this.log.info("ExampleService2", arg)
+        this.log.info("ExampleService", this.example.action());
+        this.log.info("ExampleService2", arg);
         return 'ExampleService2Action arg = ' + arg
     }
 }
