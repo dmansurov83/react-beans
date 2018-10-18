@@ -1,4 +1,4 @@
-import {bean, connectBeans} from "./beans";
+import {bean, connectBeans, inject, profile} from "./beans";
 import BeanProvider from './BeanProvider';
 
-export {bean, connectBeans, BeanProvider};
+export {bean, connectBeans, inject, profile, BeanProvider};

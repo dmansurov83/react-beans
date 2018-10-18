@@ -1,4 +1,4 @@
-import { bean, profile } from "../../../../src/beans";
+import { bean, profile } from "../../../../src";
 
 export const LOGGER = "log";
 

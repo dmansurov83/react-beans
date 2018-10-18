@@ -1,4 +1,4 @@
-import { profile, bean } from "../../../../src/beans";
+import { profile, bean } from "../../../../src";
 
 export const EXAMPLE_SERVICE = "example";
 

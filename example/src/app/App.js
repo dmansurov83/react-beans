@@ -1,6 +1,5 @@
 import React from 'react';
-import {connectBeans} from '../../../src/beans';
-import {inject} from "../../../lib/beans";
+import {connectBeans, inject} from '../../../src';
 import {LOGGER} from "./services/Logger";
 import {EXAMPLE_SERVICE2} from "./services/ExampleService2";
 import {CONFIG} from "./config";

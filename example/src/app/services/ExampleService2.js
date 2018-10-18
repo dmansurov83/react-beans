@@ -1,4 +1,4 @@
-import {bean, inject} from "../../../../src/beans";
+import {bean, inject} from "../../../../src";
 import {LOGGER} from "./Logger";
 import {EXAMPLE_SERVICE} from "./ExampleService";
 
