@@ -3,8 +3,7 @@ import { bean, profile } from "../../../../src";
 export const LOGGER = "log";
 
 @bean(LOGGER)
-@profile("debug")
-class DebugLogger{
+export class DebugLogger{
     
     info(...args){
         console.log((new Date()).toISOString(), ...args)
@@ -17,7 +16,7 @@ class DebugLogger{
 
 @bean(LOGGER)
 @profile("release")
-class ReleaseLogger{
+export class ReleaseLogger{
     
     info(...args){
     }
