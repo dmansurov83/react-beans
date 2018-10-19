@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const beansClasses = {};
+let beansClasses = {};
 
 const BeanScope = {
     SINGLETON: 'SINGLETON',
@@ -9,22 +9,34 @@ const BeanScope = {
 };
 
 const DEFAULT_PROFILE = 'default';
-const PROFILES_PROP = 'X-Bean-Profiles';
+
+class ProfilesWrapper {
+    constructor(profiles, target) {
+        this.profiles = profiles;
+        this.target = target;
+    }
+}
 
 const profile = (...profiles) => (target) => {
-    if (profiles && profiles.length) {
-        target[PROFILES_PROP] = profiles;
-    }
+    if (!(profiles && profiles.length)) throw Error('Profile(s) name missing');
+    return new ProfilesWrapper(profiles, target);
 };
 
-const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
-    const profiles = target[PROFILES_PROP] ? target[PROFILES_PROP] : [DEFAULT_PROFILE];
+const required = (cause) => {
+    throw new Error(cause);
+};
+
+const bean = (regName = required('Empty bean name'), scope = BeanScope.SINGLETON) => (target) => {
+    if (Object.values(BeanScope).indexOf(scope) === -1) {
+        throw new Error('Unknown scope : ' + scope)
+    }
+    let profiles = [DEFAULT_PROFILE];
+    if (target instanceof ProfilesWrapper) {
+        profiles = target.profiles;
+        target = target.target;
+    }
     profiles.forEach(profile => {
         if (!beansClasses[profile]) beansClasses[profile] = {};
-        const regName = name || target.name;
-        if (!regName) {
-            throw new Error(`Bean qualifier not specified`, target)
-        }
         if (beansClasses[profile][regName]) {
             throw new Error(`trying to register already defined bean "${regName}"`);
         } else {
@@ -33,20 +45,21 @@ const bean = (name, scope = BeanScope.SINGLETON) => (target) => {
                 target,
             }
         }
-    })
+    });
+    return target;
 };
 
 const inject = beanKey => (target, key) => {
-    let beanInstance;
     return {
         configurable: true,
         get() {
-            if (beanInstance) return beanInstance;
+            const privateKey = `_bean_instance_${key}`;
+            if (this[privateKey]) return this[privateKey];
             const context = this.beansContext || this.props;
             const resolveBean = context && context.getBeanInstance;
             if (!resolveBean) throw new Error(`Cant find bean resolver in ${target}`);
-            beanInstance = resolveBean(beanKey);
-            return beanInstance;
+            this[privateKey] = resolveBean(beanKey);
+            return this[privateKey];
         },
         set() {
             throw new Error(`${key} is readonly`);
@@ -76,20 +89,32 @@ const connectBeans = function (target) {
     return componentWrapper(target);
 };
 
+const getBeanInfo = (key = required('Key is epmty'), profile = DEFAULT_PROFILE) => {
+    return (beansClasses[profile] && beansClasses[profile][key]) || (beansClasses[DEFAULT_PROFILE] && beansClasses[DEFAULT_PROFILE][key]);
+};
+
 const getBeanInstance = (context, key, profile = DEFAULT_PROFILE) => {
     if (!context.beansInst) {
         context.beansInst = {};
     }
+    if (!context.getBeanInstance) {
+        context.getBeanInstance = (beanKey) => getBeanInstance(context, beanKey, profile)
+    }
     if (!!context.beansInst[key]) return context.beansInst[key];
-    const beanInfo = beansClasses[profile][key] || beansClasses[DEFAULT_PROFILE][key];
+    const beanInfo = getBeanInfo(key, profile);
     if (!beanInfo) throw new Error(`Bean with qualifier <${key}> not registered for profile <${profile}>`);
-    const bean = typeof beanInfo.target === 'function' ? new beanInfo.target() : beanInfo.target;
-    bean.beansContext = context;
-    if (bean.postInject) bean.postInject();
+    let bean = beanInfo.target;
+    if (typeof beanInfo.target === 'function') {
+        bean = new beanInfo.target();
+        bean.beansContext = context;
+        if (bean.postInject) bean.postInject();
+    }
     if (beanInfo.scope === BeanScope.SINGLETON) {
         context.beansInst[key] = bean
     }
     return bean;
 };
 
-export {bean, profile, connectBeans, getBeanInstance, inject};
+const resetRegisteredBeans = () => beansClasses = {};
+
+export {bean, profile, connectBeans, getBeanInstance, inject, getBeanInfo, resetRegisteredBeans, BeanScope};
