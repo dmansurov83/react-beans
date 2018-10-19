@@ -5,15 +5,15 @@
 - @connectBeans now without args;
 ## React dependency injection library
 
-Usage:
+### Usage:
 
-1. Wrap your app with BeanProvider component:
+#### 1. Wrap your app with BeanProvider component:
 ```jsx harmony
         <BeanProvider>
             <App/>
         <BeanProvider>
 ```    
-2. Register your bean services:
+#### 2. Register your bean services:
 * with decorators:
 ```jsx harmony
 export const EXAMPLE_SERVICE = "example";
@@ -27,9 +27,9 @@ or
 ```jsx harmony
 bean(EXAMPLE_SERVICE)(ExampleService)
 ```
-3. Inject:
+#### 3. Inject:
 
-important: js files should be imported to be added to the chunk
+**important**: js files should be imported to be added to the chunk
 
 All injections are lazy - Instances are created only if you access to the @inject property.
   
@@ -98,7 +98,39 @@ class ReleaseLogger{
 ```jsx harmony
 <BeanProvider activeProfile="debug"><App/></BeanProvider>
 ```
-! Keep the decorators in order: @bean @profile class !
+**Keep the decorators in order: @bean @profile class**
+
+## Testing
+You can use test profile to define beans (e.g. data mocks)
+
+Jest example:
+```jsx harmony
+test('Test bean should be injected from test', () => {
+    @bean(LOGGER)
+    @profile("test")
+    class TestLogger {
+        logs = [];
+        info(...args) {
+            this.logs.push({level: 'info', time: new Date(), message: args});
+        }
+        error(...args) {
+            this.logs.push({level: 'error', time: new Date(), message: args});
+        }
+    }
+
+    const m = mount(<BeanProvider
+        activeProfile={"test"}
+        nonBean={"nonBean"}>
+        <App/>
+    </BeanProvider>);
+    const app = m.find(App).children().instance();
+    const {logger} = app;
+    expect(logger.constructor.name).toBe("TestLogger");
+    console.log(logger.logs);
+    expect(logger.logs.length).toBeGreaterThan(0);
+    m.unmount();
+});
+```
 
 ## See full example in ./example
 just clone repo & npm i & npm start

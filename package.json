@@ -8,7 +8,7 @@
     "compile": "babel src --loose --out-dir lib",
     "test": "jest",
     "start": "webpack-dev-server --watch",
-    "prepublish": "npm run clean && npm run compile"
+    "prepublish": "npm run clean && npm test && npm run compile"
   },
   "repository": {
     "type": "git",
