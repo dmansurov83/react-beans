@@ -1,4 +1,14 @@
 import {bean, connectBeans, inject, profile, BeanScope} from "./beans";
 import BeanProvider from './BeanProvider';
 
-export {bean, BeanScope, connectBeans, inject, profile, BeanProvider};
+const withInject = connectBeans;
+
+export {
+    bean,
+    BeanScope,
+    connectBeans,
+    withInject,
+    inject,
+    profile,
+    BeanProvider
+};

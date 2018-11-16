@@ -1,10 +1,10 @@
 import React from 'react';
-import {connectBeans, inject} from '../../../src';
+import {inject, withInject} from '../../../src';
 import {LOGGER} from "./services/Logger";
 import {API_SERVICE} from "./services/Api";
 import {CONFIG} from "./config";
 
-@connectBeans
+@withInject
 export default class App extends React.Component {
     @inject(LOGGER)
     logger;
