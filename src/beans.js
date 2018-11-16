@@ -105,7 +105,7 @@ const getBeanInstance = (context, key, profile = DEFAULT_PROFILE) => {
     if (!beanInfo) throw new Error(`Bean with qualifier <${key}> not registered for profile <${profile}>`);
     let bean = beanInfo.target;
     if (typeof beanInfo.target === 'function') {
-        bean = new beanInfo.target();
+        bean = new beanInfo.target(context);
         bean.beansContext = context;
         if (bean.postInject) bean.postInject();
     }
