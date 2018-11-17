@@ -70,11 +70,15 @@ const inject = beanKey => (target, key) => {
 const getDisplayName = WrappedComponent => WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
 const connectBeans = function (WrappedComponent) {
-    const Wrapped = (props) => <BeansReactContext.Consumer>
-        {({getBeanInstance}) => <WrappedComponent {...props} getBeanInstance={getBeanInstance}/>}
-    </BeansReactContext.Consumer>;
-    Wrapped.displayName = `connectBeans(${getDisplayName(WrappedComponent)})`;
-    return Wrapped;
+    return class WithInject extends React.Component {
+        static displayName = `connectBeans(${getDisplayName(WrappedComponent)})`;
+
+        render() {
+            return <BeansReactContext.Consumer>
+                {({getBeanInstance}) => <WrappedComponent {...this.props} getBeanInstance={getBeanInstance}/>}
+            </BeansReactContext.Consumer>
+        }
+    };
 };
 
 const getBeanInfo = (key = required('Key is epmty'), profile = DEFAULT_PROFILE) => {
