@@ -1,5 +1,6 @@
 import {bean, connectBeans, inject, profile, BeanScope} from "./beans";
 import BeanProvider from './BeanProvider';
+import {createBeansContext} from "./context";
 
 const withInject = connectBeans;
 
@@ -10,5 +11,6 @@ export {
     withInject,
     inject,
     profile,
-    BeanProvider
+    BeanProvider,
+    createBeansContext
 };

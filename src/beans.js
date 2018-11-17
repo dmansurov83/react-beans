@@ -8,7 +8,7 @@ const BeanScope = {
     INSTANCE: 'INSTANCE'
 };
 
-const DEFAULT_PROFILE = 'default';
+export const DEFAULT_PROFILE = 'default';
 
 class ProfilesWrapper {
     constructor(profiles, target) {

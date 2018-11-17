@@ -1,7 +1,7 @@
 import createReactContext from 'create-react-context';
-import {getBeanInstance} from "./beans";
+import {DEFAULT_PROFILE, getBeanInstance} from "./beans";
 
-export const createBeansContext = (passedBeans, activeProfile) => {
+export const createBeansContext = (passedBeans = {}, activeProfile = DEFAULT_PROFILE) => {
     const beansContext = {
         beansInst: {
             ...passedBeans
@@ -11,7 +11,7 @@ export const createBeansContext = (passedBeans, activeProfile) => {
     return beansContext;
 };
 
-export const BeansReactContext = createReactContext(createBeansContext({}, 'default'));
+export const BeansReactContext = createReactContext(createBeansContext());
 
 
 
