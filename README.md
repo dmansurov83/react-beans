@@ -28,7 +28,7 @@ or
 bean(EXAMPLE_SERVICE)(ExampleService)
 ```
 
-###or register as fabric
+#### or register as builder
 ```jsx harmony
 bean("ExampleService1")((beansContext) => 
     new ExampleService("init example service 1"));
@@ -147,7 +147,7 @@ test('Test bean should be injected from test', () => {
     m.unmount();
 });
 ```
-##p.s
+## p.s
 In some cases you should able to get some bean instance before your 
 app component rendered.
 
