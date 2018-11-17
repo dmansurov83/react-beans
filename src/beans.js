@@ -1,7 +1,7 @@
 import React from 'react';
 import {BeansReactContext} from "./context";
 
-let beansClasses = {};
+let registeredBeans = {};
 
 const BeanScope = {
     SINGLETON: 'SINGLETON',
@@ -36,11 +36,11 @@ const bean = (regName = required('Empty bean name'), scope = BeanScope.SINGLETON
         target = target.target;
     }
     profiles.forEach(profile => {
-        if (!beansClasses[profile]) beansClasses[profile] = {};
-        if (beansClasses[profile][regName]) {
+        if (!registeredBeans[profile]) registeredBeans[profile] = {};
+        if (registeredBeans[profile][regName]) {
             throw new Error(`trying to register already defined bean "${regName}"`);
         } else {
-            beansClasses[profile][regName] = {
+            registeredBeans[profile][regName] = {
                 scope,
                 target,
             }
@@ -82,7 +82,7 @@ const connectBeans = function (WrappedComponent) {
 };
 
 const getBeanInfo = (key = required('Key is epmty'), profile = DEFAULT_PROFILE) => {
-    return (beansClasses[profile] && beansClasses[profile][key]) || (beansClasses[DEFAULT_PROFILE] && beansClasses[DEFAULT_PROFILE][key]);
+    return (registeredBeans[profile] && registeredBeans[profile][key]) || (registeredBeans[DEFAULT_PROFILE] && registeredBeans[DEFAULT_PROFILE][key]);
 };
 
 const getBeanInstance = (context, key, profile = DEFAULT_PROFILE) => {
@@ -107,6 +107,6 @@ const getBeanInstance = (context, key, profile = DEFAULT_PROFILE) => {
     return bean;
 };
 
-const resetRegisteredBeans = () => beansClasses = {};
+const resetRegisteredBeans = () => registeredBeans = {};
 
 export {bean, profile, connectBeans, getBeanInstance, inject, getBeanInfo, resetRegisteredBeans, BeanScope};

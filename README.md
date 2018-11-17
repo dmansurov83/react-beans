@@ -27,6 +27,22 @@ or
 ```jsx harmony
 bean(EXAMPLE_SERVICE)(ExampleService)
 ```
+
+###or register as fabric
+```jsx harmony
+bean("ExampleService1")((beansContext) => 
+    new ExampleService("init example service 1"));
+bean("ExampleService2")((beansContext) => 
+    new ExampleService("init example service 2"));
+```
+this approach allow you to inject dependencies to the constructor
+```jsx harmony
+bean("logger")(Logger);
+bean("ExampleService")(({getBeanInstance}) => 
+    new ExampleService(getBeanInstance("logger")));
+```
+
+
 #### 3. Inject:
 
 **important**: js files should be imported to be added to the chunk
@@ -131,6 +147,32 @@ test('Test bean should be injected from test', () => {
     m.unmount();
 });
 ```
+##p.s
+In some cases you should able to get some bean instance before your 
+app component rendered.
+
+You can create beans context and get bean instance from it.
+And then pass it to the BeanProvider component.
+
+example:
+```jsx harmony
+import config from './config';
+import {createBeansContext, BeanProvider} from 'react-beans';
+
+//createBeansContext(predefinedBeanInstances, activeProfile = default)
+const beansContext = createBeansContext({config});
+
+const logger = beansContext.getBeanInstance('logger');
+logger.info('App started');
+
+ReactDOM.render(
+    <BeanProvider
+        beansContext={beansContext}>
+        <App/>
+    </BeanProvider>, document.getElementById('root'));
+```
+
+
 
 ## See full example in ./example
 just clone repo & npm i & npm start

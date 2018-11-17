@@ -181,3 +181,34 @@ test('postInject should be called after inject', () => {
     const instance = getBeanInstance({}, "test");
     expect(instance.postInjectCalled).toBe(true);
 });
+
+test('beans should able to be registered as builder function', () => {
+    class Test {
+        constructor(field) {
+            this.field = field;
+        }
+    }
+
+    bean("q1")(() => new Test("q1"));
+    bean("q2")(() => new Test("q2"));
+    const context = {};
+    const q1 = getBeanInstance(context, "q1");
+    const q2 = getBeanInstance(context, "q2");
+    expect(q1.field).toBe("q1");
+    expect(q2.field).toBe("q2");
+});
+
+test('builder should able to inject dependency to constructor', () => {
+    class Test {
+        constructor(config) {
+            this.config = config;
+        }
+    }
+
+    const config = {version: 1};
+
+    bean("config")(config);
+    bean("test")(({getBeanInstance: inject}) => new Test(inject("config")));
+    const test = getBeanInstance({}, "test");
+    expect(test.config).toBe(config);
+});
