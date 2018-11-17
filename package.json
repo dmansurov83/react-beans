@@ -1,6 +1,6 @@
 {
   "name": "react-beans",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "React DI library",
   "main": "lib/index.js",
   "scripts": {
@@ -24,9 +24,9 @@
     "create-react-context": "^0.2.3"
   },
   "peerDependencies": {
+    "prop-types": "^15.6.0",
     "react": ">=15",
-    "react-dom": ">=15",
-    "prop-types": "^15.6.0"
+    "react-dom": ">=15"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
