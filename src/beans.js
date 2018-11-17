@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import {BeansReactContext} from "./context";
 
 let beansClasses = {};
 
@@ -67,26 +67,14 @@ const inject = beanKey => (target, key) => {
     };
 };
 
-function componentWrapper(WrappedComponent) {
-    class ClassWithBeans extends React.Component {
-        static contextTypes = {
-            getBeanInstance: PropTypes.func,
-        };
+const getDisplayName = WrappedComponent => WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-        render() {
-            const props = {
-                ...this.props,
-                getBeanInstance: this.context.getBeanInstance
-            };
-            return <WrappedComponent {...props}/>;
-        }
-    }
-
-    return ClassWithBeans;
-}
-
-const connectBeans = function (target) {
-    return componentWrapper(target);
+const connectBeans = function (WrappedComponent) {
+    const Wrapped = (props) => <BeansReactContext.Consumer>
+        {({getBeanInstance}) => <WrappedComponent {...props} getBeanInstance={getBeanInstance}/>}
+    </BeansReactContext.Consumer>;
+    Wrapped.displayName = `connectBeans(${getDisplayName(WrappedComponent)})`;
+    return Wrapped;
 };
 
 const getBeanInfo = (key = required('Key is epmty'), profile = DEFAULT_PROFILE) => {

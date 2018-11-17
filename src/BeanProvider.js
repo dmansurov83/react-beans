@@ -1,34 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getBeanInstance} from "./beans";
+import {BeansReactContext, createBeansContext} from "./context";
 
-export default class BeanProvider extends React.Component{
+export default class BeanProvider extends React.Component {
     static propTypes = {
         activeProfile: PropTypes.string,
         children: PropTypes.element.isRequired,
+        beansContext: PropTypes.object,
     };
 
-    static childContextTypes = {
-        getBeanInstance: PropTypes.func.isRequired,
-        beansInst: PropTypes.object,
-    };
-
-    constructor(props){
+    constructor(props) {
         super(props);
-        const {activeProfile, ...passedBeans} = props;
-        this.beansContext = {
-            beansInst:{
-                ...passedBeans
-            }
-        };
-        this.beansContext.getBeanInstance = (key) => getBeanInstance(this.beansContext, key, activeProfile)
-    }
-
-    getChildContext() {
-        return this.beansContext;
+        const {activeProfile, beansContext, ...passedBeans} = props;
+        this.beansContext = beansContext || createBeansContext(passedBeans, activeProfile)
     }
 
     render() {
-        return React.Children.only(this.props.children);
+        return <BeansReactContext.Provider value={this.beansContext}>
+            {this.props.children}
+        </BeansReactContext.Provider>;
     }
 }
