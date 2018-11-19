@@ -50,7 +50,11 @@ bean("ExampleService")(({getBeanInstance}) =>
 All injections are lazy - Instances are created only if you access to the @inject property.
   
 
+
 * to component
+Wrap your components first with *connectBeans* or *withInject* (alias for connectBeans). 
+Then your component will receive function *getBeanInstance(beanId)* to props, and you can inject beans to it with *inject* decorator or manually.
+
 ```jsx harmony
 @connectBeans
 class About extends Component {
@@ -67,11 +71,11 @@ class About extends Component {
 }
 ```
 * to other service
+Injecting to services not requires any wrappers. Main condition - service should contains beanContext property (autofilled on create service)
 ```jsx harmony
 const ALERT_SERVICE = "alert";
 
 @bean(ALERT_SERVICE)
-@connectBeans(EXAMPLE_SERVICE, OTHER_SERVICE)
 class AlertService {
     @inject("example")
     example;
